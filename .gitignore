@@ -1,4 +1,8 @@
 *.exe
 *.obj
-!.asm
+*EDIT.COM
+*README.DOC
+*masm.IMg
+/.vscode
+!.asm #追踪
 !.md
