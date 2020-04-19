@@ -1,0 +1,73 @@
+;删除第五行内容，和前面一个程序超像
+; AL:存放当前字符；
+; SI：取字符指针，初值指向 BUF-1
+; DI: 送字符指针(第 6 行及其之后的字符要依次送到第 4 个换行符之后)
+; CX：行数计数器，初值为 4，每循环一次之后其值减 1，当(CX)=0 时，SI 指着第4 个换行符，即第 4 行的行尾。
+.386
+DATA SEGMENT USE16
+BUF DB 'LINE1:AAAAAAAAAAAAAAAA',0DH, 0AH
+DB 'LINE2:BBBBBBBBBBBBBB ', 0DH, 0AH
+DB 'LINE3:CCCCCCCCCCCCCCCC', 0DH, 0AH
+DB 'LINE4:DDDDDDDDDDDD ',0DH, 0AH
+DB 'LINE5:EEEEEEEEEEEEEEEE', 0DH, 0AH
+DB 'lINE6:FFFFFFFFFFFFFFFF ',0DH, 0AH
+DB 'LINE7:GGGGGGGGGGGGGGGGGGGGGG', 0DH, 0AH, 0
+AFTER DB 0DH, 0AH, 'AFTER******************************AFTER',0DH,0AH,'$'
+N=5
+DATA ENDS
+STACK SEGMENT USE16 STACK
+DB 200 DUP(0)
+STACK ENDS
+CODE SEGMENT USE16
+ASSUME CS:CODE,SS:STACK,DS:DATA
+BEGIN:
+    MOV AX,DATA
+    MOV DS,AX
+    LEA SI,BUF
+LOP2:
+    MOV DL,[SI]
+    CMP DL,0
+    JE LOP1;直到遇到空白0H为结束标志
+    MOV AH,2
+    INT 21H
+    INC SI
+    JMP LOP2
+;显示删除前的字符串
+LOP1:
+    LEA DX,AFTER
+    MOV AH,9
+    INT 21H;显示字符串
+    LEA SI,BUF-1;之后会有INC SI，所以预先先减个1
+    MOV CX,N-1;行计数器，为4.
+NEXT1:
+    INC SI
+    CMP [SI],BYTE PTR 0AH
+    JNE NEXT1
+    LOOP NEXT1;寻找第N-1行的换行符。DEC CX
+NEXT22:
+    MOV DI,SI;使DI指向第N-1个换行符,即第四个换行符
+NEXT2:
+    INC SI
+    CMP [SI],BYTE PTR 0AH
+    JNE NEXT2;寻找第N个换行符
+NEXT3:
+    INC SI
+    INC DI
+    MOV AL,[SI];把第N行的都移到N-1行的位置
+    MOV [DI],AL
+    CMP AL,0;不到最后就一直挪
+    JNE NEXT3
+    LEA SI,BUF
+PLAY:;用于显示结果
+    MOV DL,[SI]
+    OR DL,DL
+    JZ EXIT
+    MOV AH,2
+    INT 21H;一个一个输出BUF区的内容，直到DL==0H的时候，结束
+    INC SI
+    JMP PLAY
+EXIT:
+    MOV AH,4CH
+    INT 21H
+CODE ENDS
+END BEGIN

@@ -1,0 +1,40 @@
+;例4-4，x>=0,y>=0返回1，x<0,y<0返回-1，xy异号返回0
+;显然考分支程序的应用
+.386
+DATA SEGMENT USE16
+X DB -8
+Y DB 9
+A DB ?;答案
+E DB 'the answer is:',0AH,0DH,'$'
+DATA ENDS
+
+STACK SEGMENT USE16 STACK
+DB 200 DUP(0)
+STACK ENDS
+
+CODE SEGMENT USE16
+ASSUME CS:CODE,SS:STACK,DS:DATA
+BEGIN:
+    MOV AX,DATA
+    MOV DS,AX
+    CMP X,0
+    JS L1
+    MOV A,1
+    JMP EXIT
+L1: CMP Y,0
+    JGE L2
+    MOV A,-1
+    JMP EXIT
+L2: MOV A,0
+EXIT:;我额外加了几句话吧这个字符输出了。
+    LEA DX,E
+    MOV AH,9
+    INT 21H;输出一句话
+    MOV DL,A
+    OR DL,30H;把真值转化为ASCII码
+    MOV AH,2
+    INT 21H
+    MOV AH,4CH
+    INT 21H
+CODE ENDS
+END BEGIN

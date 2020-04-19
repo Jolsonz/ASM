@@ -1,0 +1,44 @@
+;例4.7 
+;统计MOV出现的次数，以Contrl+z即1AH作为结束标志。统计结果放在NUM中
+.386
+DATA SEGMENT USE16
+PROG DB 'MOV AX,DATA',0DH,0AH,'MOV DS,AX',0DH,0AH,
+     DB 'MOV AX,0',0DH,0AH,1AH;这里没有属性描述符，所以会给个警告，但没事
+NUM DW 0
+DATA ENDS
+
+STACK SEGMENT USE16 STACK
+DB 200 DUP(0)
+STACK ENDS
+
+CODE SEGMENT USE16
+ASSUME CS:CODE,SS:STACK,DS:DATA
+BEGIN:
+    MOV AX,DATA
+    MOV DS,AX
+    XOR AX,AX;清0，用来存答案
+    MOV SI,OFFSET PROG
+LOPA:
+    CMP BYTE PTR[SI],1AH;PTR不能不加，因为类型不明
+    JE EXIT
+    CMP BYTE PTR[SI],'M'
+    JNE NEXT
+    CMP BYTE PTR[SI+1],'O'
+    JNE NEXT
+    CMP BYTE PTR[SI+2],'V'
+    JNE NEXT
+    INC AX
+    ADD SI,2;这里加2，是因为一共应该加3，NEXT里面加1，所以这里加2
+NEXT:
+    INC SI;下一个
+    JMP LOPA
+EXIT:
+    MOV NUM,AX
+    MOV DL,NUM
+    OR DL,30H
+    MOV AH,2
+    INT 21H;自己加了个输出。
+    MOV AH,4CH
+    INT 21H
+CODE ENDS
+END BEGIN

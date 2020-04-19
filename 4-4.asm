@@ -1,0 +1,36 @@
+.386
+DATA SEGMENT USE16
+BUF DW 660H,650H,650H;三个被测单元
+A DW 0;存变了的
+B DW 0;存不变的
+DATA ENDS
+STACK SEGMENT USE16 STACK
+DB 200 DUP(0)
+STACK ENDS
+CODE SEGMENT USE16
+ASSUME CS:CODE,SS:STACK,DS:DATA
+BEGIN:
+    MOV AX,DATA
+    MOV DS,AX
+    MOV AX,BUF;注意不是指针方式哦
+    CMP AX,BUF+2
+    JNE L1;第一个单元内容与第二个单元内容比较
+    ;不等转L1，相等则必定是第三个单元的元素变了
+    MOV AX,BUF+4;第三个单元内容
+    MOV A,AX
+    MOV B,OFFSET BUF+4;题目要求吧地址送到B
+    JMP EXIT
+L1: CMP AX,BUF+4
+    JNE L2;即第一个是不同的
+    ;即第二个是不同的
+    MOV AX,BUF+2
+    MOV A,AX
+    MOV B,OFFSET BUF+2
+    JMP EXIT
+L2: MOV A,AX
+    MOV B,OFFSET BUF
+EXIT:
+    MOV AH,4CH
+    INT 21H
+CODE ENDS
+END BEGIN
