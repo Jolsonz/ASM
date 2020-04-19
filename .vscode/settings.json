@@ -1,0 +1,11 @@
+{
+    "files.exclude": {
+        ".vscode": true,
+        "**/*.exe": true,
+        "**/*.EXE": true,
+        "**/*.OBJ": true,
+        "EDIT.COM": true,
+        "masm.IMg": true,
+        "README.DOC": true
+    }
+}
