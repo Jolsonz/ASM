@@ -1,18 +1,34 @@
 ;计算 z=((w-x)/10*y)
-;没成功，下次再试试。
+;OK，成功了，结果应该是64,即40H，计算成功
+;可能数据规模大会溢出，暂时没考虑这个。
+;Z放结果
+.386
+DATA SEGMENT USE16
+z dw ?
+w dw 30
+x dw 8
+y dw 4
+DATA ENDS
+
 STACK SEGMENT USE16 STACK
 DB 200 DUP(0)
 STACK ENDS
+
 CODE SEGMENT USE16
-ASSUME SS:STACK,CS:CODE
-BEGIN: MOV AX,1
-       MOV BX,2
-       MOV CX,Y
+ASSUME CS:CODE,SS:STACK,DS:DATA
+BEGIN:
+       MOV AX,DATA
+       MOV DS,AX
+       MOV AX,W
+       MOV BX,X
        SUB AX,BX
+       CWD;把AX的符号扩展到DX中
        MOV BX,10
-       IDIV BX;字除法:  (DX，AX)/(OPS)→AX(商)，DX(余数),由于不保留余数，所以这里不管
-       IMUL AX
-       IMUL AX;平方
+       IDIV BX; DX,AX/BX->AX商，DX余数
+       MOV DX,y
+       IMUL AX,DX;AX*DX->AX
+       IMUL AX,AX
+       MOV z,AX
        MOV AH,4CH
        INT 21H
 CODE ENDS

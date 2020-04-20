@@ -18,7 +18,7 @@ B:     OR EAX,EAX
        MOV BYTE PTR [SI] , '-';先放入符号
        INC SI
 PLUS: MOV EBX,10;10进制,EBX是radix的入口参数。
-      CALL RADIX
+      CALL RADIX;转成10进制数放在BUF存储区。
       MOV BYTE PTR [SI],'$';末尾加结束符
       LEA DX,BUF;输出内容。
       MOV AH,9
