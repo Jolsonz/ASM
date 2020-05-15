@@ -10,7 +10,7 @@ F2T10  PROC
        PUSH SI;保护现场
        LEA SI,BUF
        CMP DX,32
-       JE B
+       JE B;32位
        MOVSX EAX,AX;不是32位的给符号扩展到32位，不然16位负数可能会出错。
 B:     OR EAX,EAX
        JNS PLUS;为正转
